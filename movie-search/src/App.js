@@ -31,7 +31,6 @@ class App extends React.Component {
     )
       .then(data => data.json())
       .then(data => {
-        console.log(data);
         this.setState({
           movies: [...data.results],
           totalResults: data.total_results
@@ -69,7 +68,7 @@ class App extends React.Component {
     const filteredMovie = this.state.movies.filter(movie => movie.id === id);
     if (filteredMovie.length > 0) {
       this.setState({
-        currentMovie: filteredMovie
+        currentMovie: filteredMovie[0]
       });
     }
   };
@@ -96,19 +95,21 @@ class App extends React.Component {
               movies={this.state.movies}
               viewMovieInfo={this.viewMovieInfo}
             />
+            {this.state.totalResults > 20 ? (
+              <Pagination
+                pages={numberPages}
+                nextPage={this.nextPage}
+                currentPage={this.state.currentPage}
+              />
+            ) : (
+              ""
+            )}
           </div>
         ) : (
-          <MovieInfo closeMovieInfo={this.closeMovieInfo} />
-        )}
-
-        {this.state.totalResults > 20 ? (
-          <Pagination
-            pages={numberPages}
-            nextPage={this.nextPage}
-            currentPage={this.state.currentPage}
+          <MovieInfo
+            closeMovieInfo={this.closeMovieInfo}
+            currentMovie={this.state.currentMovie}
           />
-        ) : (
-          ""
         )}
       </div>
     );

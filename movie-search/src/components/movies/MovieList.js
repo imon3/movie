@@ -7,7 +7,14 @@ const MovieList = props => {
       <div className="row">
         <div className="col s12">
           {props.movies.map((movie, index) => {
-            return <Movie key={index} image={movie.poster_path} />;
+            return (
+              <Movie
+                key={index}
+                image={movie.poster_path}
+                viewMovieInfo={props.viewMovieInfo}
+                movieId={movie.id}
+              />
+            );
           })}
         </div>
       </div>
