@@ -3,6 +3,7 @@ import "./App.css";
 import Nav from "./components/navbar/Nav";
 import SearchArea from "./components/searchBox/SearchArea";
 import MovieList from "./components/movies/MovieList";
+import Pagination from "./components/pagination/Pagination";
 
 class App extends React.Component {
   constructor() {
@@ -10,7 +11,9 @@ class App extends React.Component {
 
     this.state = {
       movies: [],
-      searchTerm: ""
+      searchTerm: "",
+      totalResults: 0,
+      currentPage: 1
     };
 
     this.apiKey = process.env.REACT_APP_API;
@@ -25,8 +28,10 @@ class App extends React.Component {
     )
       .then(data => data.json())
       .then(data => {
+        console.log(data);
         this.setState({
-          movies: [...data.results]
+          movies: [...data.results],
+          totalResults: data.total_results
         });
       })
       .catch(err => console.log(err));
@@ -38,7 +43,25 @@ class App extends React.Component {
     });
   };
 
+  nextPage = pageNumber => {
+    fetch(
+      `https://api.themoviedb.org/3/search/movie?api_key=${this.apiKey}&query=${
+        this.state.searchTerm
+      }&page=${pageNumber}`
+    )
+      .then(data => data.json())
+      .then(data => {
+        this.setState({
+          movies: [...data.results],
+          currentPage: pageNumber
+        });
+      })
+      .catch(err => console.log(err));
+  };
+
   render() {
+    const numberPages = Math.floor(this.state.totalResults / 20);
+
     return (
       <div className="App">
         <Nav />
@@ -47,6 +70,15 @@ class App extends React.Component {
           handleChange={this.handleChange}
         />
         <MovieList movies={this.state.movies} />
+        {this.state.totalResults > 20 ? (
+          <Pagination
+            pages={numberPages}
+            nextPage={this.nextPage}
+            currentPage={this.state.currentPage}
+          />
+        ) : (
+          ""
+        )}
       </div>
     );
   }
